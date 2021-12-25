@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
-# from xgboost import XGBClassifier
+from xgboost import XGBClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -68,13 +68,13 @@ def choose_best_model(df, cv, x, y):
               ('KNN', KNeighborsClassifier()),
               ('CART', DecisionTreeClassifier()),
               ('NB', GaussianNB()),
-              # ('XGB', XGBClassifier(silent=False, n_jobs=13, random_state=15, n_estimators=100)),
+              ('XGB', XGBClassifier(silent=False, n_jobs=13, random_state=15, n_estimators=100)),
               ('NN', MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1))]
     for name, m in models:
         print(f'\n{name}:')
         train_and_evaluate_model(m, x, y, cv)
-        # print('now again only with best feature')
-        # train_and_evaluate_model(m, df[best_features], df[['rating']].values.ravel(), cv)
+        print('now again only with best feature')
+        train_and_evaluate_model(m, df[best_features], df[['rating']].values.ravel(), cv)
 
 
 def parameter_tuning(x, y):
@@ -96,8 +96,6 @@ def calc_improvement(x, y):
     base_model = RandomForestClassifier()
     base_accuracy = cross_val_score(base_model, x, y, scoring='accuracy', cv=cv, n_jobs=-1)
     print('Base accuracy: %.3f (%.3f)' % (mean(base_accuracy), std(base_accuracy)))
-    # best_param = {'n_estimators': 2000, 'min_samples_split': 5, 'min_samples_leaf': 1, 'max_features': 'auto',
-    #               'max_depth': None, 'bootstrap': False}
     best_random = RandomForestClassifier(n_estimators=2000, min_samples_split=5, min_samples_leaf=1, max_features='auto'
                                          , max_depth=None, bootstrap=False)
     improved_accuracy = cross_val_score(best_random, x, y, scoring='accuracy', cv=cv, n_jobs=-1)
@@ -105,15 +103,7 @@ def calc_improvement(x, y):
     print('Improvement of {:0.2f}%.'.format(100 * (mean(improved_accuracy) - mean(base_accuracy)) / mean(base_accuracy)))
 
 
-if __name__ == '__main__':
-    df = pd.read_csv("csv_files/text_training.csv", encoding="UTF-8")
-    df = clean_data(df)
-    cv = KFold(n_splits=10, random_state=1, shuffle=True)
-    x, y = get_xy(df)
-    # choose_best_model(df, cv, x, y)
-    # parameter_tuning(x, y)
-    # calc_improvement(x, y)
-
+def create_recommendation_file(x, y):
     rf = RandomForestClassifier(n_estimators=2000, min_samples_split=5, min_samples_leaf=1, max_features='auto',
                                 max_depth=None, bootstrap=False)
     rf.fit(x, y)
@@ -121,7 +111,18 @@ if __name__ == '__main__':
     clean_df = clean_data(rollout_df)
     clean_df = clean_df.drop("rating", axis=1)
     rollout_df['rating'] = rf.predict(clean_df)
-    (rollout_df[['ID', 'rating']]).to_csv("csv_files/recommendations.csv")
+    (rollout_df[['ID', 'rating']]).to_csv("csv_files/recommendations.csv", index=False)
+
+
+if __name__ == '__main__':
+    df = pd.read_csv("csv_files/text_training.csv", encoding="UTF-8")
+    df = clean_data(df)
+    cv = KFold(n_splits=10, random_state=1, shuffle=True)
+    x, y = get_xy(df)
+    choose_best_model(df, cv, x, y)
+    parameter_tuning(x, y)
+    calc_improvement(x, y)
+    create_recommendation_file(x,y)
 
 
 
