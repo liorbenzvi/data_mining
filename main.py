@@ -114,6 +114,17 @@ if __name__ == '__main__':
     # parameter_tuning(x, y)
     # calc_improvement(x, y)
 
+    rf = RandomForestClassifier(n_estimators=2000, min_samples_split=5, min_samples_leaf=1, max_features='auto',
+                                max_depth=None, bootstrap=False)
+    rf.fit(x, y)
+    rollout_df = pd.read_csv("csv_files/text_rollout_X.csv", encoding="UTF-8")
+    clean_df = clean_data(rollout_df)
+    clean_df = clean_df.drop("rating", axis=1)
+    rollout_df['rating'] = rf.predict(clean_df)
+    (rollout_df[['ID', 'rating']]).to_csv("csv_files/recommendations.csv")
+
+
+
 
 
 
