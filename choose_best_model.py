@@ -13,7 +13,6 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import RandomizedSearchCV
 from hw1_main import print_feature_importance
 
 
@@ -55,11 +54,17 @@ def choose_best_model(df):
         print_feature_importance(m, x, y)
 
 
+def perform_features_manipulation(df):
+    return df
+
+
 if __name__ == '__main__':
     df = pd.read_csv('csv_files/hw#2/train_data/reviews_training.csv', encoding="UTF-8")
     df = add_rating_feature(df)
     choose_best_model(df)
-    print('Try again with featurs manipulation')
+    print('Try again with features manipulation')
+    df = perform_features_manipulation(df)
+    choose_best_model(df)
 
 
 
