@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
-from xgboost import XGBClassifier
+# from xgboost import XGBClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -68,7 +68,7 @@ def choose_best_model(df, cv, x, y):
               ('KNN', KNeighborsClassifier()),
               ('CART', DecisionTreeClassifier()),
               ('NB', GaussianNB()),
-              ('XGB', XGBClassifier(silent=False, n_jobs=13, random_state=15, n_estimators=100)),
+              # ('XGB', XGBClassifier(silent=False, n_jobs=13, random_state=15, n_estimators=100)),
               ('NN', MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1))]
     for name, m in models:
         print(f'\n{name}:')

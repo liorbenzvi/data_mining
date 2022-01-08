@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
-from xgboost import XGBClassifier
+# from xgboost import XGBClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -45,7 +45,7 @@ def choose_best_model(df):
               ('KNN', KNeighborsClassifier()),
               ('CART', DecisionTreeClassifier()),
               ('NB', GaussianNB()),
-              ('XGB', XGBClassifier(silent=False, n_jobs=13, random_state=15, n_estimators=100)),
+              # ('XGB', XGBClassifier(silent=False, n_jobs=13, random_state=15, n_estimators=100)),
               ('NN', MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1))]
     for name, m in models:
         print(f'\nCheck model: {name}:')
@@ -55,11 +55,19 @@ def choose_best_model(df):
 
 
 def perform_features_manipulation(df):
+    numeric_features = ['OTHER_SITE_VALUE', 'NUM_DEAL', 'LAST_DEAL', 'ADVANCE_PURCHASE', 'FARE_L_Y1', 'FARE_L_Y2',
+                        'FARE_L_Y3', 'FARE_L_Y4', 'FARE_L_Y5', 'POINTS_L_Y1', 'POINTS_L_Y2', 'POINTS_L_Y3',
+                        'POINTS_L_Y4', 'POINTS_L_Y5']
+    for col in numeric_features:
+        df[col + '_bool'] = (df[col] > 0).astype(int)
+        df["col_group"] = pd.cut(df[col], 5, precision=0, labels=range(0, 5))
+        df.drop(col, axis=1)
     return df
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('csv_files/hw#2/train_data/reviews_training.csv', encoding="UTF-8")
+    df = pd.read_csv('csv_files/hw#2/train_data/ffp_train.csv', encoding="UTF-8")
+    df = df.drop(['ID'], axis=1)
     df = add_rating_feature(df)
     choose_best_model(df)
     print('Try again with features manipulation')
