@@ -33,7 +33,7 @@ def get_xy(df):
     return x, y
 
 
-def print_feature_importance(model):
+def print_feature_importance(model, x, y):
     model.fit(x, y)
     if hasattr(model, 'feature_importances_') or hasattr(model, 'coef_'):
         if hasattr(model, 'feature_importances_'):
@@ -54,7 +54,7 @@ def print_feature_importance(model):
 def train_and_evaluate_model(model, x, y, cv):
     scores = cross_val_score(model, x, y, scoring='accuracy', cv=cv, n_jobs=-1)
     print('Accuracy: %.3f (%.3f)' % (mean(scores), std(scores)))
-    print_feature_importance(model)
+    print_feature_importance(model, x, y)
 
 
 def choose_best_model(df, cv, x, y):

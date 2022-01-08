@@ -35,9 +35,7 @@ def add_rating_feature(df):
     return df
 
 
-if __name__ == '__main__':
-    df = pd.read_csv('csv_files/hw#2/train_data/reviews_training.csv', encoding="UTF-8")
-    df = add_rating_feature(df)
+def choose_best_model(df):
     cv = KFold(n_splits=10, random_state=1, shuffle=True)
     x, y = get_xy(df)
     print('going to check different models:')
@@ -54,7 +52,15 @@ if __name__ == '__main__':
         print(f'\nCheck model: {name}:')
         scores = cross_val_score(m, x, y, scoring='accuracy', cv=cv, n_jobs=-1)
         print_evaluation_methods(m, scores, x, y)
-        print_feature_importance(m)
+        print_feature_importance(m, x, y)
+
+
+if __name__ == '__main__':
+    df = pd.read_csv('csv_files/hw#2/train_data/reviews_training.csv', encoding="UTF-8")
+    df = add_rating_feature(df)
+    choose_best_model(df)
+    print('Try again with featurs manipulation')
+
 
 
 
