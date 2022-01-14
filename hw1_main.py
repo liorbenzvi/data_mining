@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
-# from xgboost import XGBClassifier
+from xgboost import XGBClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -103,7 +103,7 @@ def calc_improvement(x, y):
     print('Improvement of {:0.2f}%.'.format(100 * (mean(improved_accuracy) - mean(base_accuracy)) / mean(base_accuracy)))
 
 
-def create_recommendation_file(x, y):
+def create_recommendation_file_rf(x, y):
     rf = RandomForestClassifier(n_estimators=2000, min_samples_split=5, min_samples_leaf=1, max_features='auto',
                                 max_depth=None, bootstrap=False)
     rf.fit(x, y)
@@ -114,6 +114,13 @@ def create_recommendation_file(x, y):
     (rollout_df[['ID', 'rating']]).to_csv("csv_files/recommendations.csv", index=False)
 
 
+def create_recommendation_file(x, y, model, rollout_df):
+    model[1].fit(x, y)
+    clean_df = clean_data(rollout_df)
+    res = model[1].predict(clean_df)
+    return pd.DataFrame({"ID": rollout_df['ID'], 'rating' + model[0]: res})
+
+
 if __name__ == '__main__':
     df = pd.read_csv("csv_files/hw#1/text_training.csv", encoding="UTF-8")
     df = clean_data(df)
@@ -122,7 +129,7 @@ if __name__ == '__main__':
     choose_best_model(df, cv, x, y)
     parameter_tuning(x, y)
     calc_improvement(x, y)
-    create_recommendation_file(x, y)
+    create_recommendation_file_rf(x, y)
 
 
 
